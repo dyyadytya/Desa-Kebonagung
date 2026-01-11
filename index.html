@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desa Kebonagung - Portal Digital Resmi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1600');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Container iframe responsif untuk peta */
+        .map-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 70%; /* Rasio aspek */
+            height: 0;
+            overflow: hidden;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        .map-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .history-card, .news-card {
+            transition: all 0.3s ease;
+        }
+        
+        .history-card:hover, .news-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Modal styling */
+        #newsModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <!-- Navigasi -->
+    <nav class="fixed w-full z-50 glass-nav border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                        <i class="fas fa-house"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">Kebonagung<span class="text-indigo-600">Digital</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8 font-medium text-sm uppercase tracking-wide">
+                    <a href="#beranda" class="hover:text-indigo-600 transition">Beranda</a>
+                    <a href="#profil" class="hover:text-indigo-600 transition">Profil</a>
+                    <a href="#sejarah" class="hover:text-indigo-600 transition">Sejarah</a>
+                    <a href="#berita" class="hover:text-indigo-600 transition">Berita</a>
+                    <a href="#layanan" class="hover:text-indigo-600 transition">Layanan</a>
+                    <a href="#peta" class="hover:text-indigo-600 transition">Peta Wilayah</a>
+                    <a href="#kontak" class="bg-indigo-600 text-white px-5 py-2 rounded-full hover:bg-indigo-700 transition">Hubungi Kami</a>
+                </div>
+                <!-- Tombol Menu Mobile -->
+                <div class="md:hidden flex items-center">
+                    <button class="text-slate-600 hover:text-indigo-600">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modal Detail Berita -->
+    <div id="newsModal" onclick="closeModal()">
+        <div class="bg-white max-w-2xl w-full rounded-2xl overflow-hidden shadow-2xl relative" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black transition z-10">
+                <i class="fas fa-times"></i>
+            </button>
+            <img id="modalImg" src="" class="w-full h-64 object-cover" alt="Detail">
+            <div class="p-8">
+                <span id="modalTag" class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-[10px] font-bold uppercase mb-4 inline-block"></span>
+                <h2 id="modalTitle" class="text-2xl font-bold mb-4"></h2>
+                <p id="modalDate" class="text-slate-400 text-sm mb-6"></p>
+                <div id="modalContent" class="text-slate-600 leading-relaxed max-h-64 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bagian Hero -->
+    <section id="beranda" class="pt-16">
+        <div class="hero-gradient h-[600px] flex items-center justify-center text-center px-4">
+            <div class="max-w-3xl">
+                <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">Mewujudkan Desa Inovatif & Terkoneksi</h1>
+                <p class="text-xl text-slate-200 mb-8">Selamat datang di Portal Resmi Desa Kebonagung. Transformasi digital untuk pelayanan publik yang lebih transparan dan efisien.</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#layanan" class="px-8 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition">E-Pelayanan</a>
+                    <a href="#profil" class="px-8 py-3 bg-white text-slate-900 rounded-lg font-semibold hover:bg-slate-100 transition">Profil Desa</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tentang Kami / Profil Desa -->
+    <section id="profil" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="relative">
+                    <img src="Landscape.jpg" alt="Landscape Desa Kebonagung" class="rounded-3xl shadow-2xl object-cover h-[450px] w-full">
+                    <div class="absolute -bottom-6 -right-6 bg-indigo-600 text-white p-6 rounded-2xl shadow-xl hidden md:block max-w-[200px]">
+                        <p class="text-2xl font-bold italic">"masyarakat berdaya, masa depan terbuka."</p>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-indigo-600 font-bold tracking-widest uppercase text-sm mb-2">Tentang Kami</h4>
+                        <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Mengenal Desa Kebonagung</h2>
+                        <div class="w-20 h-1 bg-indigo-600 rounded-full mt-4"></div>
+                    </div>
+                    <p class="text-slate-600 leading-relaxed text-lg">
+                        Desa Kebonagung berada di Kecamatan Sukodono, Kabupaten Sidoarjo, Provinsi Jawa Timur. Secara geografis, desa ini terletak pada kisaran koordinat 7°25′ LU–7°30′ LS dan 112°40′–112°45′ BT, dengan titik representatif sekitar -7.4171 LS dan 112.6773 BT.
+                    </p>
+                    <p class="text-slate-600 leading-relaxed">
+                        Kebonagung berkembang sebagai wilayah permukiman dan pertanian dataran rendah yang menjadi bagian dari lanskap historis Sidoarjo bagian barat. Meski catatan tertulis mengenai asal-usul nama desa masih terbatas, Kebonagung merepresentasikan desa Jawa yang tumbuh dari tradisi agraris, nilai gotong royong, serta dinamika sosial yang beriringan dengan perkembangan kawasan Sukodono sebagai wilayah penyangga perkotaan Sidoarjo.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 pt-4">
+                        <div class="border-l-4 border-indigo-600 pl-4">
+                            <h5 class="font-bold text-slate-900 text-sm">Lokasi</h5>
+                            <p class="text-slate-500 text-sm">Kec. Sukodono, Sidoarjo</p>
+                        </div>
+                        <div class="border-l-4 border-indigo-600 pl-4">
+                            <h5 class="font-bold text-slate-900 text-sm">Karakteristik</h5>
+                            <p class="text-slate-500 text-sm">Cerdas & Berdaya</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Jejak Sejarah Kami -->
+    <section id="sejarah" class="py-24 bg-slate-900 text-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <h4 class="text-indigo-400 font-bold tracking-widest uppercase text-sm mb-2">Lini Masa</h4>
+                <h2 class="text-3xl md:text-4xl font-bold">Jejak Sejarah Kami</h2>
+                <div class="w-20 h-1 bg-indigo-600 mx-auto rounded-full mt-4 mb-8"></div>
+                <p class="max-w-2xl mx-auto text-slate-400">
+                    Jejak sejarah Kelurahan Kebonagung tidak dapat dilepaskan dari dinamika alam, budaya, dan kekuasaan yang membentuk wilayah Sidoarjo sejak masa awal. Perjalanan panjang ini mencerminkan transformasi ruang dari kawasan alami hingga menjadi bagian penting dari struktur perkotaan modern.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 relative">
+                <div class="hidden md:block absolute top-1/4 left-0 w-full h-0.5 bg-indigo-900/50 z-0"></div>
+
+                <!-- Era 1 -->
+                <div class="history-card relative z-10 bg-slate-800/50 p-8 rounded-3xl border border-slate-700 backdrop-blur-sm">
+                    <div class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-indigo-500/20">
+                        <span class="font-bold text-xl">1</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-indigo-400">Era Hutan Purba</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Pada era hutan purba, wilayah Kebonagung diyakini masih berupa bentang alam hijau dengan dominasi hutan, rawa, dan lahan basah. Kawasan ini menjadi ruang hidup alami yang kemudian mulai dibuka oleh kelompok masyarakat awal. Nama <strong>“Kebonagung”</strong> berasal dari kata <em>kebon</em> (kebun) dan <em>agung</em> (besar). yang merepresentasikan wilayah dengan lahan subur dan luas yang memiliki nilai penting bagi kehidupan masyarakat. Penamaan ini mencerminkan relasi manusia dengan alam, di mana pembukaan hutan secara bertahap menghasilkan kebun-kebun produktif sebagai basis ekonomi awal.
+                    </p>
+                </div>
+
+                <!-- Era 2 -->
+                <div class="history-card relative z-10 bg-slate-800/50 p-8 rounded-3xl border border-slate-700 backdrop-blur-sm">
+                    <div class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-indigo-500/20">
+                        <span class="font-bold text-xl">2</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-indigo-400">Masa Pra-Kolonial</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Memasuki masa pra-kolonial, Kebonagung berkembang sebagai bagian dari jaringan permukiman agraris di kawasan <strong>Sidokare</strong>—nama kuno wilayah Sidoarjo. Pada periode ini, kehidupan masyarakat berpusat pada pertanian, pengelolaan air, serta ikatan sosial berbasis adat dan gotong royong. Kebonagung berfungsi sebagai ruang penyangga pangan dan pemukiman yang terintegrasi dengan desa-desa lain di sekitarnya, sekaligus menjadi bagian dari sistem sosial Jawa yang kuat dengan nilai kebersamaan dan kearifan lokal.
+                </div>
+
+                <!-- Era 3 -->
+                <div class="history-card relative z-10 bg-slate-800/50 p-8 rounded-3xl border border-slate-700 backdrop-blur-sm">
+                    <div class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-indigo-500/20">
+                        <span class="font-bold text-xl">3</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-indigo-400">Era Kolonial & Modern</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Perubahan signifikan terjadi pada era kolonial, khususnya setelah tahun 1859, ketika pemerintah Hindia Belanda meresmikan Sidoarjo sebagai pusat pemerintahan menggantikan Sidokare. Sejak saat itu, Kebonagung secara administratif masuk dalam struktur wilayah baru yang dibentuk kolonial. Pembangunan infrastruktur, pengaturan tata wilayah, serta sistem administrasi modern mulai memengaruhi kehidupan masyarakat. Kebonagung tidak lagi hanya dipandang sebagai wilayah agraris, tetapi juga sebagai bagian integral dari kawasan penyangga kota yang terus berkembang..
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-16 text-center italic text-slate-500 text-sm italic">
+                "Jejak masa lalu tetap hidup dalam identitas masyarakat, tradisi lokal, serta semangat kolektif Kebonagung."
+            </div>
+        </div>
+    </section>
+
+    <!-- Bagian Berita (TAMBAHAN) -->
+    <section id="berita" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+                <div>
+                    <h4 class="text-indigo-600 font-bold tracking-widest uppercase text-sm mb-2">Update Terkini</h4>
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Berita Kebonagung</h2>
+                    <div class="w-20 h-1 bg-indigo-600 rounded-full mt-4"></div>
+                </div>
+                <p class="text-slate-500 max-w-md">Informasi terbaru seputar kegiatan warga, pembangunan desa, dan kabar penting lainnya.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Berita 1 -->
+                <div class="news-card group bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden cursor-pointer" onclick="openNews(1)">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="kecelakaan.webp" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-4 left-4 px-3 py-1 bg-red-600 text-white text-[10px] font-bold rounded-lg uppercase">Peristiwa</span>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-slate-400 text-xs mb-3 font-semibold uppercase tracking-wider">26 Februari 2025</p>
+                        <h3 class="text-lg font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition">Kecelakaan di Dusun Saimbang</h3>
+                        <p class="text-slate-500 text-sm line-clamp-2 mb-4">Insiden lalu lintas di jalan utama desa yang melibatkan pengendara roda dua semalam.</p>
+                        <span class="text-indigo-600 text-sm font-bold inline-flex items-center gap-2">Selengkapnya <i class="fas fa-chevron-right text-[10px]"></i></span>
+                    </div>
+                </div>
+
+                <!-- Berita 2 -->
+                <div class="news-card group bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden cursor-pointer" onclick="openNews(2)">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="budidaya-lele.jpeg" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-4 left-4 px-3 py-1 bg-green-600 text-white text-[10px] font-bold rounded-lg uppercase">Ekonomi</span>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-slate-400 text-xs mb-3 font-semibold uppercase tracking-wider">11 September 2025</p>
+                        <h3 class="text-lg font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition">Budidaya Lele Warga Kebonagung</h3>
+                        <p class="text-slate-500 text-sm line-clamp-2 mb-4">Kunjungan Polsek Sukodono dalam meninjau potensi ketahanan pangan budidaya lele.</p>
+                        <span class="text-indigo-600 text-sm font-bold inline-flex items-center gap-2">Selengkapnya <i class="fas fa-chevron-right text-[10px]"></i></span>
+                    </div>
+                </div>
+
+                <!-- Berita 3 -->
+                <div class="news-card group bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden cursor-pointer" onclick="openNews(3)">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="bansos.jpg" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-4 left-4 px-3 py-1 bg-indigo-600 text-white text-[10px] font-bold rounded-lg uppercase">Sosial</span>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-slate-400 text-xs mb-3 font-semibold uppercase tracking-wider">05 Juni 2024</p>
+                        <h3 class="text-lg font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition">Penyaluran Bantuan Pangan</h3>
+                        <p class="text-slate-500 text-sm line-clamp-2 mb-4">Sebanyak 344 warga menerima bantuan pangan beras 10kg tahap kedua tahun ini.</p>
+                        <span class="text-indigo-600 text-sm font-bold inline-flex items-center gap-2">Selengkapnya <i class="fas fa-chevron-right text-[10px]"></i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bagian Statistik -->
+    <section class="py-12 bg-slate-50 border-y border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+                <div class="text-3xl font-bold text-indigo-600 mb-1">4,250+</div>
+                <div class="text-slate-500 text-sm">Penduduk</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold text-indigo-600 mb-1">1,120</div>
+                <div class="text-slate-500 text-sm">Kepala Keluarga</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold text-indigo-600 mb-1">12</div>
+                <div class="text-slate-500 text-sm">RW / Dusun</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold text-indigo-600 mb-1">98%</div>
+                <div class="text-slate-500 text-sm">Tingkat Literasi</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Layanan -->
+    <section id="layanan" class="py-20">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Layanan Digital</h2>
+                <div class="w-20 h-1 bg-indigo-600 mx-auto rounded-full mb-4"></div>
+                <p class="text-slate-600">Akses layanan administratif desa langsung dari rumah Anda.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition group">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition">
+                        <i class="fas fa-id-card text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Administrasi Kependudukan</h3>
+                    <p class="text-slate-600 mb-4">Pengurusan surat pengantar KTP, KK, dan Akta Kelahiran secara online.</p>
+                    <a href="#" class="text-indigo-600 font-semibold flex items-center gap-2">Mulai <i class="fas fa-arrow-right text-sm"></i></a>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition group">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition">
+                        <i class="fas fa-hand-holding-heart text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Bantuan Sosial</h3>
+                    <p class="text-slate-600 mb-4">Informasi dan pendaftaran bantuan sosial dari pemerintah daerah maupun pusat.</p>
+                    <a href="#" class="text-blue-600 font-semibold flex items-center gap-2">Cek Status <i class="fas fa-arrow-right text-sm"></i></a>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition group">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-purple-600 group-hover:text-white transition">
+                        <i class="fas fa-bullhorn text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Pengaduan Warga</h3>
+                    <p class="text-slate-600 mb-4">Sampaikan keluhan atau saran untuk perbaikan fasilitas umum di desa.</p>
+                    <a href="#" class="text-purple-600 font-semibold flex items-center gap-2">Lapor <i class="fas fa-arrow-right text-sm"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bagian Peta -->
+    <section id="peta" class="py-20 bg-slate-100">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid lg:grid-cols-3 gap-12 items-center">
+                <div class="lg:col-span-1">
+                    <h2 class="text-3xl font-bold mb-6">Peta Wilayah Desa</h2>
+                    <p class="text-slate-600 mb-8">
+                        Desa Kebonagung memiliki tata kelola wilayah yang terstruktur. 
+                        Gunakan peta interaktif di samping untuk melihat batas administratif, lokasi fasilitas publik, dan sebaran infrastruktur desa.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4 p-4 bg-white rounded-lg shadow-sm">
+                            <i class="fas fa-map-marked-alt text-indigo-600 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold">Pemetaan Digital</h4>
+                                <p class="text-sm text-slate-500">Integrasi batas wilayah dengan sistem Google Maps.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 p-4 bg-white rounded-lg shadow-sm">
+                            <i class="fas fa-info-circle text-blue-600 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold">Detail Wilayah</h4>
+                                <p class="text-sm text-slate-500">Klik pada titik tertentu di peta untuk melihat detail informasi.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-2">
+                    <!-- Embed Google My Maps -->
+                    <div class="map-container">
+                        <iframe src="https://www.google.com/maps/d/embed?mid=1Na4lWnOQYkfk8XHTBNB8ShELRzHNtoA&ehbc=2E312F"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="kontak" class="bg-slate-900 text-slate-300 py-16">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                            <i class="fas fa-house"></i>
+                        </div>
+                        <span class="text-xl font-bold tracking-tight text-white">Kebonagung<span class="text-indigo-600">Digital</span></span>
+                    </div>
+                    <p class="max-w-md">Transformasi Desa Kebonagung menuju masyarakat mandiri dan sejahtera melalui inovasi teknologi dan pelayanan yang transparan.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-6">Tautan Cepat</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="hover:text-indigo-500 transition">Transparansi Dana Desa</a></li>
+                        <li><a href="#" class="hover:text-indigo-500 transition">Struktur Organisasi</a></li>
+                        <li><a href="#" class="hover:text-indigo-500 transition">Potensi Wisata</a></li>
+                        <li><a href="#" class="hover:text-indigo-500 transition">Berita Desa</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-6">Kontak</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-center gap-3"><i class="fas fa-envelope text-indigo-500"></i> odibismillahkuliah@gmail.com</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-phone text-indigo-500"></i> 082196469114</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-map-pin text-indigo-500"></i> Kabupaten Sidoarjo, Jawa Timur</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+                <p>&copy; 2024 Pemerintah Desa Kebonagung. Hak Cipta Dilindungi.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-white transition">Kebijakan Privasi</a>
+                    <a href="#" class="hover:text-white transition">Syarat & Ketentuan</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const newsData = {
+            1: {
+                title: "Kecelakaan di Dusun Saimbang Sidoarjo",
+                tag: "Peristiwa",
+                date: "Rabu, 26 Februari 2025",
+                img: "./kecelakaan.webp",
+                content: "Telah terjadi kecelakaan lalu lintas di Jalan Raya Desa Kebonagung semalam. Kejadian ini melibatkan dua pengendara sepeda motor. Pihak kepolisian setempat telah menangani insiden ini dan menghimbau warga untuk berhati-hati saat berkendara di malam hari."
+            },
+            2: {
+                title: "Polsek Sukodono Tinjau Budidaya Lele Warga",
+                tag: "Ekonomi",
+                date: "Kamis, 11 September 2025",
+                img: "./budidaya-lele.jpeg",
+                content: "Dalam rangka mendukung ketahanan pangan mandiri, Polsek Sukodono melakukan peninjauan terhadap kolam budidaya lele milik warga di Desa Kebonagung. Hal ini diharapkan menjadi contoh bagi warga lain untuk memanfaatkan lahan pekarangan sebagai sumber ekonomi baru."
+            },
+            3: {
+                title: "Penyaluran Bantuan Pangan Tahap II 2024",
+                tag: "Sosial",
+                date: "Rabu, 05 Juni 2024",
+                img: "./bansos.jpg",
+                content: "Pemerintah Desa Kebonagung telah sukses menyalurkan bantuan beras 10kg kepada 344 Keluarga Penerima Manfaat (KPM). Penyaluran berjalan dengan tertib di Balai Desa mulai pukul 08.00 WIB."
+            }
+        };
+
+        function openNews(id) {
+            const data = newsData[id];
+            document.getElementById('modalTitle').innerText = data.title;
+            document.getElementById('modalTag').innerText = data.tag;
+            document.getElementById('modalImg').src = data.img;
+            document.getElementById('modalDate').innerText = data.date;
+            document.getElementById('modalContent').innerText = data.content;
+            document.getElementById('newsModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('newsModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('newsModal')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
